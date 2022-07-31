@@ -1,0 +1,34 @@
+{
+    "models": [
+        {
+            "path": "proc.1.pt",
+            "type": "proc1",
+            "device": "cpu",
+            "autoload": false
+        },
+        {
+            "path": "proc.2.pt",
+            "type": "proc2",
+            "device": "cpu",
+            "autoload": false
+        },
+        {
+            "path": "disease/lettuce.leaf.pt",
+            "type": "proc3",
+            "autoload": false
+        },
+        {
+            "path": "disease/pepper.leaf.pt",
+            "type": "proc3",
+            "autoload": false
+        },
+        {
+            "path": "disease/tomato.leaf.pt",
+            "type": "proc3",
+            "autoload": false
+        }
+    ],
+    "disease": {
+        
+    }
+}

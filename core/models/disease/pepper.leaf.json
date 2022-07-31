@@ -1,0 +1,20 @@
+{
+    "labels": [
+        "healthy",
+        "bacterial_spot"
+    ],
+    "assist": {
+        "healthy": {
+            "not": [
+                "frogeye",
+                "scab"
+            ]
+        },
+        "bacterial_spot": {
+            "has": [
+                "frogeye",
+                "scab"
+            ]
+        }
+    }
+}

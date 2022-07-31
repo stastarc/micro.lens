@@ -1,0 +1,29 @@
+{
+    "labels": [
+        "healthy",
+        "sclerotinia_rot",
+        "downy_mildew"
+    ],
+    "assist": {
+        "healthy": {
+            "not": [
+                "scab",
+                "frogeye",
+                "powderv"
+            ]
+        },
+        "sclerotinia_rot": {
+            "has": [
+                "scab",
+                "powderv"
+            ]
+        },
+        "downy_mildew": {
+            "has": [
+                "scab",
+                "frogeye",
+                "powderv"
+            ]
+        }
+    }
+}

@@ -1,0 +1,27 @@
+{
+    "labels": [
+        "healthy",
+        "leaf_mold",
+        "late_blight"
+    ],
+    "assist": {
+        "healthy": {
+            "not": [
+                "frogeye",
+                "scab"
+            ]
+        },
+        "leaf_mold": {
+            "has": [
+                "frogeye",
+                "scab"
+            ]
+        },
+        "late_blight": {
+            "has": [
+                "frogeye",
+                "scab"
+            ]
+        }
+    }
+}
