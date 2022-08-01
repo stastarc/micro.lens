@@ -1,4 +1,3 @@
-import re
 from typing import Any
 import cv2
 
@@ -7,6 +6,7 @@ from env import Env
 from .report import DiseaseReport, PredictReport
 from .config import ModelsConfig
 from .model import ModelManager
+from .dump import PredictDumps
 from .model.proc3 import Proc3
 from .model.proc2 import Proc2
 
@@ -30,18 +30,23 @@ class Predict:
         ModelManager.dispose()
 
     @staticmethod
-    def analysis(img) -> PredictReport | None:
+    def analysis(img, dump: bool = False, des: str | None = None) -> tuple[PredictReport, str] | PredictReport | None:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        pred, pred_raw = Predict.detect_plant(img)
+        proc1_pred = Predict.detect_plant(img)
 
-        if pred == None: 
+        if proc1_pred == None: 
             return None
         
+        pred, pred_raw = proc1_pred
         x, y, w, h, s, l, = pred
         name, area, = l.split('.')
         disease = Predict.analysis_disease(img[y:y+h, x:x+w], name, area)
+        if disease:
+            disease, pred2_raw = disease
+        else:
+            pred2_raw = None
 
-        return PredictReport(
+        report = PredictReport(
             score=s,
             name=name,
             area=area,
@@ -49,13 +54,18 @@ class Predict:
             disease=disease
         )
 
+        if dump:
+            return report, PredictDumps.save(img, des, report, pred_raw, pred2_raw)
+        
+        return report
+
 
     @staticmethod
     def detect_plant(img) -> tuple[int, int, int, int, float, str, Any] | None:
         return ModelManager.get('proc.1.pt', autoload=True).predict(img)
 
     @staticmethod
-    def analysis_disease(img, name: str, area: str) -> DiseaseReport | None:
+    def analysis_disease(img, name: str, area: str) -> tuple[DiseaseReport, Any] | None:
         proc3: Proc3 | None = ModelManager.get_safe(f'disease/{name}.{area}.pt', autoload=True)
         
         if proc3 == None:
@@ -63,11 +73,12 @@ class Predict:
 
         pred: list[tuple[str, float]] = proc3.predict(img, size=512)
         proc2: Proc2 = ModelManager.get('proc.2.pt', autoload=True)
-        pub_pred, raw_pub = proc2.predict(img)
-
-        if pred == None or pub_pred == None:
+        proc2_pred = proc2.predict(img)
+        
+        if pred == None or proc2_pred == None:
             return None
-
+        
+        pub_pred, raw_pub = proc2_pred
         disease, score = max(pred, key=lambda x: x[1])
         assist = proc3.assist[disease]
 
@@ -80,7 +91,7 @@ class Predict:
                 name=disease,
                 score=score,
                 rect=None
-            )
+            ), raw_pub
         
         if assist['has']:
             pub_filt = [1 if area[-1] in assist['has'] else -1 for area in pub_pred]
@@ -102,5 +113,5 @@ class Predict:
             name=disease,
             score=score,
             rect=rect
-        )
+        ), raw_pub
         
