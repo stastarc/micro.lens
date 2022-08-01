@@ -74,10 +74,6 @@ class Predict:
         pred: list[tuple[str, float]] = proc3.predict(img, size=512)
         proc2: Proc2 = ModelManager.get('proc.2.pt', autoload=True)
         proc2_pred = proc2.predict(img)
-        
-        if pred == None or proc2_pred == None:
-            return None
-        
         pub_pred, raw_pub = proc2_pred
         disease, score = max(pred, key=lambda x: x[1])
         assist = proc3.assist[disease]
@@ -88,6 +84,7 @@ class Predict:
                 if n: score /= n
             
             return DiseaseReport(
+                healthy=True,
                 name=disease,
                 score=score,
                 rect=None
@@ -95,7 +92,7 @@ class Predict:
         
         if assist['has']:
             pub_filt = [1 if area[-1] in assist['has'] else -1 for area in pub_pred]
-            best = proc2.find_best_area(raw_pub, lambda l, _: pub_filt[l] == 1)
+            best = proc2.find_best_area(raw_pub, lambda i, l, s: pub_filt[i] == 1)
 
             n = sum(pub_filt)
             if n > 0: score = (score+n)/(1+n)
@@ -110,6 +107,7 @@ class Predict:
             rect = None
 
         return DiseaseReport(
+            healthy=False,
             name=disease,
             score=score,
             rect=rect

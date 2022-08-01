@@ -20,7 +20,7 @@ class Yolov5(Model):
         self.model.agnostic = self.agnostic
         self.loaded = True
     
-    def predict(self, img, **args) -> Any | None:
+    def predict(self, img, **args) -> Any:
         return self.model(img)
     
     def dispose(self):

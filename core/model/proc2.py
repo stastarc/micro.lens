@@ -6,12 +6,8 @@ class Proc2(Yolov5):
     def __init__(self, path: str, device: str, agnostic: bool = True) -> None:
         super().__init__(path=path, device=device, agnostic=agnostic)
 
-    def predict(self, img, **args) -> tuple[list[tuple[int, int, int, int, float, str]], Any] | None:
+    def predict(self, img, **args) -> tuple[list[tuple[int, int, int, int, float, str]], Any]:
         pred = super().predict(img, **args)
-
-        if pred == None or not len(pred.xywh[0]):
-            return None
-
         xywh = pred.xywh[0]
 
         return [self.to_pred(area) for area in xywh], pred
@@ -26,12 +22,12 @@ class Proc2(Yolov5):
             self.model.names[int(area[5])]  # type: ignore
         )
 
-    def find_best_area(self, areas, filter: Callable[[int, float], bool] | None) -> int:
+    def find_best_area(self, areas, filter: Callable[[int, int, float], bool] | None) -> int:
         best_index = -1
         best_loss = -1
 
         for i, area in enumerate(areas.xywhn[0]):
-            if filter != None and not filter(int(area[5]), area[4]):
+            if filter != None and not filter(i, int(area[5]), area[4]):
                 continue
 
             xc, yc = area[0], area[1]

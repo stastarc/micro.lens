@@ -23,9 +23,9 @@ async def predict(
         return token.payload
     
     user_id = token.payload.id
-    c = Credit.update(user_id, 0, None)
+    current_credit = Credit.update(user_id, 0, None)
 
-    if c <= 0:
+    if current_credit <= 0:
         return error(403, 'Lack of credit.')
 
     try:
@@ -49,6 +49,8 @@ async def predict(
     
     # 으으 이 불길한거
     del img
+
+    disease = None
     
     if report != None:
         report, report_file = report
@@ -64,21 +66,24 @@ async def predict(
             if plant:
                 plant.updated_at = plant.updated_at.isoformat()
 
-            if disease:
+            if disease != None:
                 disease.updated_at = disease.updated_at.isoformat()
 
-            if Credit.session_update(sess, user_id, -1, f'analysis user:{user_id}') == -1: # 결과는 절대 안주지 ㅋㅋ
-                return error(500, 'credit service error')
+            current_credit = Credit.session_update(sess, user_id, -1, f'analysis user:{user_id}')
 
+            if current_credit == -1: # 결과는 절대 안주지 ㅋㅋ
+                return error(500, 'credit service error')
     else:
         plant = None
-        disease = None
     
     return {
         'info': {
             'report': report,
             'plant': plant,
             'disease': disease
+        },
+        'credit': {
+            'current': current_credit
         }
     }
     

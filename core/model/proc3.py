@@ -22,11 +22,8 @@ class Proc3(Classifier):
             self.assist = cfg['assist']
         
 
-    def predict(self, img, **args) -> list[float] | list[tuple[str, float]] | None:
+    def predict(self, img, **args) -> list[float] | list[tuple[str, float]]:
         scores = super().predict(img, **args)
-
-        if scores == None:
-            return None
 
         if not args.get('labeling', True):
             return [float(score) for score in scores]

@@ -27,7 +27,7 @@ class Classifier(Model):
         self.model = torch.load(self.path, map_location=self.device)['model'].float()
         self.loaded = True
     
-    def predict(self, img, **args) -> Any | None:
+    def predict(self, img, **args) -> Any:
         size = args.get('size', None) or 512
         resize = torch.nn.Upsample(size=(size, size), mode='bilinear', align_corners=False)
         im = np.ascontiguousarray(np.asarray(img).transpose((2, 0, 1)))
