@@ -4,7 +4,7 @@ import numpy as np
 from fastapi import Response, Depends, UploadFile, File
 from fastapi.routing import APIRouter
 from core.predict import Predict
-from database import scope, Plants, Credit, Report
+from database import scope, Plants, Credit, Report, Disease
 from micro import auth_method, VerifyBody
 
 router = APIRouter(prefix='/analysis')
@@ -58,19 +58,27 @@ async def predict(
 
             plant = Plants.session_search_detail(sess, report.name, 'name')
 
+            if report.disease != None:
+                disease = Disease.session_get_detail(sess, report.name, report.disease.name)
+
             if plant:
                 plant.updated_at = plant.updated_at.isoformat()
 
+            if disease:
+                disease.updated_at = disease.updated_at.isoformat()
+
             if Credit.session_update(sess, user_id, -1, f'analysis user:{user_id}') == -1: # 결과는 절대 안주지 ㅋㅋ
                 return error(500, 'credit service error')
-            
+
     else:
         plant = None
+        disease = None
     
     return {
         'info': {
             'report': report,
-            'plant': plant
+            'plant': plant,
+            'disease': disease
         }
     }
     

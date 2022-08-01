@@ -48,7 +48,7 @@ class Plants:
         return ShortPlantData(
             id=plant.id,
             names=Plant.parse_names(plant.names),
-            image=Plant.parse_images(plant.images)[0],
+            image=next(iter(Plant.parse_images(plant.images)), ''),
         )
     
     @staticmethod
