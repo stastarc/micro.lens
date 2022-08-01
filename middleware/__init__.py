@@ -7,6 +7,8 @@ from . import internal_api
 async def any_not_found(req, exc):
     return Response(status_code=404)
 
+async def server_error(req, exc):
+    return Response(status_code=500, content='{"error":"server error"}')
 
 def include(app: Starlette):
     app.add_middleware(ContentSizeLimitMiddleware,
@@ -16,4 +18,5 @@ def include(app: Starlette):
 
     app.add_exception_handler(404, any_not_found)
     app.add_exception_handler(405, any_not_found)
+    app.add_exception_handler(500, server_error)
     

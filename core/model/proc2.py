@@ -35,8 +35,7 @@ class Proc2(Yolov5):
                 continue
 
             xc, yc = area[0], area[1]
-            w, h = area[2], area[3]
-            loss = (w + h + (abs(.5-xc) + abs(.5-yc))*2 + (1-area[4])) / 4
+            loss = ((abs(.5-xc) + abs(.5-yc))*2 + (1-area[4])) / 2
 
             if best_index == -1 or loss < best_loss:
                 best_index = i

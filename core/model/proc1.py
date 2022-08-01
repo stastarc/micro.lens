@@ -43,7 +43,7 @@ class Proc1(Yolov5):
         for i, area in enumerate(areas):
             xc, yc = area[0], area[1]
             w, h = area[2], area[3]
-            loss = (w + h + (abs(.5-xc) + abs(.5-yc))*2 + (1-area[4])) / 4
+            loss = (w + h + abs(.5-xc) + abs(.5-yc) + (1-area[4])) / 4
 
             if best_index == -1 or loss < best_loss:
                 best_index = i

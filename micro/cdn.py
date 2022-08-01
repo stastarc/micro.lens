@@ -3,15 +3,14 @@ import requests
 
 class CDN:
     @staticmethod
-    def upload_file(file, title: str, detail: str, level: int = 0) -> str:
+    def upload_file(file, detail: str, media_type: str, level: int = 0) -> str:
         res = requests.post(
             f'http://{MicroEnv.CDN}/internal/cdn/upload',
             files={
-                'file': file,
+                'file': ('/myfile', file, media_type),
             },
             data={
-                'title': title,
-                'detail': detail,
+                'detail': detail[:200],
                 'level': level
             }
         )
