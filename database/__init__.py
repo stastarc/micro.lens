@@ -1,2 +1,4 @@
 from .db import engine, factory, scope
-from . import users
+from .plant import Plant
+from .plants import Plants
+from .credit import Credit

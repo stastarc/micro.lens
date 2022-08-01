@@ -28,6 +28,8 @@ async def auth_method(token: str = Query(...)) -> VerifyBody:
 
         if not res.success:
             return error(401, res.payload)
+        
+        res.payload = TokenPayload(**res.payload)
 
         return res
     except KeyError: return VerifyBody(success=False, payload=Response(status_code=401))

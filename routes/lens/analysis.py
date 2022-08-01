@@ -4,6 +4,7 @@ import numpy as np
 from fastapi import Response, Depends, UploadFile, File
 from fastapi.routing import APIRouter
 from core.predict import Predict
+from database import scope, Plants, Credit
 from micro import auth_method, VerifyBody
 
 router = APIRouter(prefix='/analysis')
@@ -20,6 +21,12 @@ async def predict(
 
     if not token.success:
         return token.payload
+    
+    user_id = token.payload.id
+    c = Credit.update(user_id, 0, None)
+
+    if c <= 0:
+        return error(403, 'Lack of credit.')
 
     try:
         img = cv2.imdecode(np.frombuffer(await image.read(), np.uint8), cv2.IMREAD_COLOR)
@@ -36,7 +43,21 @@ async def predict(
         traceback.print_exc()
         return error(500, 'analysis service error')
     
+    if report != None:
+        with scope() as sess:
+            plant = Plants.session_search_detail(sess, report.name, 'name')
+
+            if Credit.session_update(sess, user_id, -1, 'analysis') == -1: # 결과는 절대 안주지 ㅋㅋ
+                return error(500, 'credit service error')
+            
+            plant.updated_at = plant.updated_at.isoformat()
+    else:
+        plant = None
+    
     return {
-        'report': report
+        'info': {
+            'report': report,
+            'plant': plant
+        }
     }
     
