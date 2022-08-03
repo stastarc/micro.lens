@@ -4,7 +4,6 @@ from .plant import Plant
 from typing import Literal
 from datetime import datetime
 from dataclasses import dataclass
-from sqlalchemy import func
 
 PAGE_SIZE = 20
 
@@ -19,20 +18,29 @@ class DetailPlantData:
     id: int
     names: dict[str, str]
     images: list[str]
-    short_description: str
     description: str
+    more_description: str
     content: str
     relevent_plants: list[ShortPlantData]
     updated_at: datetime
 
 class Plants:
     @staticmethod
-    def session_search(sess, query: str, mode: Literal['full', 'name'], offset: int = 0) -> list[Plant]:
-        return sess.execute('CALL search(:q, :m)', {'q': query, 'm': mode}).limit(PAGE_SIZE).offset(offset*PAGE_SIZE).all()
+    def fulltext_search_against(mode: Literal['full', 'name']) -> str:
+        return f'MATCH (`names`{",`tags`,`short_description`" if mode=="full" else ""}) AGAINST (:q IN BOOLEAN MODE)'
+
+    @staticmethod
+    def session_search(sess, query: str, mode: Literal['full', 'name'], offset: int = 0, limit: int = PAGE_SIZE) -> list[Plant]:
+        fulltext = Plants.fulltext_search_against(mode)
+        return sess.execute(
+            f'SELECT *, {fulltext} as score FROM `{Plant.__tablename__}` WHERE {fulltext} ORDER BY score DESC LIMIT {offset*PAGE_SIZE},{limit}',
+            {'q': query}).all()
         
     @staticmethod
     def session_search_one(sess, query: str, mode: Literal['full', 'name']) -> Plant | None:
-        return sess.execute('CALL search(:q, :m)', {'q': query, 'm': mode}).first()
+        fulltext = Plants.fulltext_search_against(mode)
+        return sess.execute(f'SELECT *, {fulltext} as score FROM `{Plant.__tablename__}` WHERE {fulltext} LIMIT 1',
+            {'q': query}).first()
 
     @staticmethod
     def session_search_short(sess, query: str, mode: Literal['full', 'name'], offset: int = 0) -> list[ShortPlantData]:
@@ -57,8 +65,8 @@ class Plants:
             id=plant.id,
             names=Plant.parse_names(plant.names),
             images=Plant.parse_images(plant.images),
-            short_description=plant.short_description,
             description=plant.description,
+            more_description=plant.more_description,
             content=json.loads(plant.content),
             relevent_plants=[p for p in
                                 [Plants.session_search_short_one(sess, plant, 'name')
