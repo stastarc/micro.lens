@@ -31,7 +31,7 @@ class Plant(Base):
     @staticmethod
     def parse_images(images: str) -> list[str]:
         count = len(images) // 32
-        return [images[i*32:(i+1)*32] for i in range(count)] or ['']
+        return [images[i*32:(i+1)*32] for i in range(count)]
     
     @staticmethod
     def parse_relevant_plants(relevant_plants: str) -> list[str]:
