@@ -5,7 +5,7 @@ from fastapi import Response, Depends, UploadFile, File
 from fastapi.routing import APIRouter
 from core.predict import Predict
 from database import scope, Plants, Credit, Report, Disease
-from micro import auth_method, VerifyBody
+from micro import auth_method, VerifyBody, search_market
 
 router = APIRouter(prefix='/analysis')
 
@@ -22,7 +22,7 @@ async def predict(
     if not token.success:
         return token.payload
     
-    user_id = token.payload.id
+    user_id = token.payload.id  # type: ignore
     current_credit = Credit.update(user_id, 0, None)
 
     if current_credit <= 0:
@@ -75,6 +75,12 @@ async def predict(
                 return error(500, 'credit service error')
     else:
         plant = None
+
+    related_products = []
+    if plant:
+        related_products.extend(search_market(plant.names["ko"], 'name'))
+    if disease:
+        related_products.extend(search_market(disease.name, 'tag'))
     
     return {
         'info': {
@@ -84,6 +90,7 @@ async def predict(
         },
         'credit': {
             'current': current_credit
-        }
+        },
+        "related_products" : related_products
     }
     
