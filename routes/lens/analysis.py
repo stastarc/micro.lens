@@ -78,9 +78,7 @@ async def predict(
 
     related_products = []
     if plant:
-        related_products.extend(search_market(plant.names["ko"], 'name'))
-    if disease:
-        related_products.extend(search_market(disease.name, 'tag'))
+        related_products.extend(search_market(f'{plant.names["ko"]} {disease.name if disease else ""}', 'full'))
     
     return {
         'info': {

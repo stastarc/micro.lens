@@ -20,7 +20,6 @@ factory = sessionmaker(bind=engine)
 @contextmanager
 def scope():
     session = factory()
-    
     try:
         yield session
         session.commit()

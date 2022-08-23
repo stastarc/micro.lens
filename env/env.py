@@ -29,6 +29,7 @@ class DatabaseEnv:
 class MicroEnv:
     CDN = MICRO.get('CDN', 'localhost:5001')
     AUTH = MICRO.get('AUTH', 'localhost:5002')
+    MARKET = MICRO.get('MARKET', 'localhost:5004')
     
 class Env:
     HOST = ENV.get('HOST', None) or 'localhost'

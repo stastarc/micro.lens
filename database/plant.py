@@ -6,7 +6,7 @@ from sqlalchemy.dialects.mysql import BIGINT, VARCHAR, LONGTEXT, DATETIME
 NAMES = [
     'ko',
     'en',
-    'jp',
+    'ja',
     'zh',
 ]
 

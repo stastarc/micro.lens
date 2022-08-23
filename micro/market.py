@@ -11,4 +11,7 @@ def search_market(query: str, mode: Literal['full', 'tag', 'name']) -> list[dict
         }
     )
 
+    if res.status_code != 200:
+        return []
+
     return res.json()
