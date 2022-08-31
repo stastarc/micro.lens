@@ -13,6 +13,7 @@ engine = create_engine(
     echo=DB.ECHO,
     pool_size=40,
     max_overflow=60,
+    pool_pre_ping=True
 )
 
 factory = sessionmaker(bind=engine)
