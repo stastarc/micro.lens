@@ -14,6 +14,7 @@ class Plant(Base):
     __tablename__ = 'plants'
 
     id = Column(BIGINT, primary_key=True)
+    plant_code = Column(VARCHAR(100), nullable=False, unique=True)
     tags = Column(VARCHAR(500), nullable=False)
     names = Column(VARCHAR(200), nullable=False)
     description = Column(VARCHAR(100), nullable=False)

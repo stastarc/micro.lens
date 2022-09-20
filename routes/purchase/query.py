@@ -4,7 +4,7 @@ from micro import auth_method, VerifyBody
 
 router = APIRouter()
 
-@router.post("/credits")
+@router.get("/credits")
 async def pay(response: Response, token: VerifyBody = Depends(auth_method)):
     if not token.success:
         return token.payload

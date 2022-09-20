@@ -58,7 +58,7 @@ async def predict(
             # 우리먼저
             Report.session_report(sess, user_id, report_file)
 
-            plant = Plants.session_search_detail(sess, report.name, 'name')
+            plant = Plants.session_plant_detail(sess, report.name)
 
             if report.disease != None:
                 disease = Disease.session_get_detail(sess, report.name, report.disease.name)

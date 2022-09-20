@@ -79,3 +79,8 @@ class Plants:
     def session_search_detail(sess, query: str, mode: Literal['full', 'name']) -> DetailPlantData | None:
         p = Plants.session_search_one(sess, query, mode)
         return Plants.get_detail(sess, p) if p else None
+        
+    @staticmethod
+    def session_plant_detail(sess, plant_code: str) -> DetailPlantData | None:
+        p = sess.query(Plant).filter(Plant.plant_code == plant_code).first()
+        return Plants.get_detail(sess, p) if p else None
